@@ -1,0 +1,54 @@
+================================================================================
+FICTIONAL DEMONSTRATION INCIDENT REPORT — FOR TESTING PURPOSES ONLY
+NOT A REAL PHARMACEUTICAL RECORD OR SPECIFICATION
+================================================================================
+
+INCIDENT ID: INC-2026-0881
+DATE DISCOVERED: 2026-10-18
+INCIDENT DATE: 2026-10-17
+DEPARTMENT: Quality Control / Chemical Synthesis Operations
+INVESTIGATION OWNER: Dr. Elena Rostova (Lead QC Analytical Specialist)
+
+PRODUCT AND BATCH INFORMATION:
+Product Name: Artemicort API (Synthetic Glucocorticoid Intermediate)
+Batch Number: ART-2026-042
+Manufacturing Stage: Stage 3 — Final Crystallization & Solvent Recovery
+Equipment Identifier: Crystallizer Unit CR-04 (Vessel Capacity: 2,500 L)
+Affected Quantity: 480 kg (Bulk API Crystalline Powder, Lots 1-4)
+
+INCIDENT SUMMARY:
+During release testing of Artemicort API Batch ART-2026-042, high-performance liquid chromatography (HPLC) analytical testing detected an unknown degradation impurity (Impurity D-7) at an elevated level exceeding acceptance criteria.
+
+OBSERVED RESULT:
+HPLC assay showed Impurity D-7 at 0.38% (w/w).
+
+EXPECTED RESULT / SPECIFICATION:
+Finished API Specification SPC-ART-004 mandates: Any individual unspecified impurity <= 0.10% (w/w); Total impurities <= 0.50% (w/w).
+
+IMMEDIATE CONTAINMENT ACTIONS:
+1. Batch ART-2026-042 (Lots 1 through 4) placed under physical and SAP quarantine status in Controlled Warehouse Bay 3B.
+2. Red quarantine security tags applied to all 16 fiber drums.
+3. Crystallizer CR-04 tagged out of service pending investigation.
+4. Downstream micronization and distribution withheld.
+
+PROCESS AND OPERATIONS CONTEXT:
+During Stage 3 crystallization, the batch recipe calls for a controlled cooling curve from 68.0°C to 12.0°C over 6.0 hours under continuous nitrogen purge at 0.2 bar.
+Operator shift handover log indicates that at approximately 02:40 IST on 2026-10-17, secondary cooling loop chiller CH-02 experienced an intermittent flow valve alarm (AL-CH-309). The crystallization temperature plateaued at 44.5°C for approximately 85 minutes before cooling resumed.
+Agitation speed was recorded at 65 RPM.
+
+MISSING / PENDING MANUFACTURING RECORDS:
+- SCADA continuous temperature trend logs for Crystallizer CR-04 and Chiller CH-02 between 01:00 and 06:00 IST have not yet been extracted from the historian database.
+- Metrology calibration verification for Dual-RTD Temperature Sensor TT-204 is pending review (last scheduled calibration was 5 months ago).
+- Raw Material Certificate of Analysis for Reagent Grade Isopropanol Lot IPA-8839 (used during crystallization washing) has not been reviewed for trace acidic impurities.
+- Operator shift interview notes from Shift B have not yet been compiled.
+
+POTENTIAL PRODUCT QUALITY IMPACT:
+Impurity D-7 is a known thermal degradation byproduct of Artemicort API. Elevated levels may reduce product stability, alter crystal morphology, and violate pharmacopeial monograph standards. No product has been released to external supply chains.
+
+SEVERITY ASSESSMENT:
+Initial Severity: Critical
+Severity Rationale: Out-of-Specification (OOS) analytical result impacting finished bulk drug substance purity, requiring formal Quality Unit investigation prior to disposition.
+
+================================================================================
+END OF FICTIONAL DEMONSTRATION RECORD
+================================================================================

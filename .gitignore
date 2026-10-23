@@ -1,0 +1,14 @@
+# Git ignore for ORYVEX
+.env
+*.env
+backend/.env
+frontend/.env
+*.pyc
+__pycache__/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+node_modules/
+.DS_Store
+*.log
