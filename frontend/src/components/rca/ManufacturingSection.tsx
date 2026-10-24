@@ -20,8 +20,8 @@ export const ManufacturingSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid-3">
-        <div className="form-group">
+      <div className="grid-4">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Active Pharmaceutical Ingredient (API)
             <Badge type="provenance" value={inv.field_provenance.product_name?.source} />
@@ -35,7 +35,7 @@ export const ManufacturingSection: React.FC = () => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Batch / Lot Number
             <Badge type="provenance" value={inv.field_provenance.batch_number?.source} />
@@ -43,14 +43,14 @@ export const ManufacturingSection: React.FC = () => {
           <input
             type="text"
             className="form-input"
-            style={{ fontFamily: "JetBrains Mono", fontWeight: 600 }}
+            style={{ fontFamily: "JetBrains Mono", fontWeight: 700 }}
             value={inv.batch_number || ""}
             onChange={(e) => dispatch(updateField({ field: "batch_number", value: e.target.value }))}
             placeholder="e.g. ART-2026-042"
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Manufacturing Unit Operation
             <Badge type="provenance" value={inv.field_provenance.manufacturing_stage?.source} />
@@ -63,12 +63,10 @@ export const ManufacturingSection: React.FC = () => {
             placeholder="e.g. Stage 3 Crystallization & Solvent Recovery"
           />
         </div>
-      </div>
 
-      <div className="grid-2" style={{ marginTop: "0.5rem" }}>
-        <div className="form-group">
+        <div className="form-group col-span-1">
           <label className="form-label">
-            Process Equipment Tag
+            Equipment Tag
             <Badge type="provenance" value={inv.field_provenance.equipment_id?.source} />
           </label>
           <input
@@ -76,13 +74,13 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.equipment_id || ""}
             onChange={(e) => dispatch(updateField({ field: "equipment_id", value: e.target.value }))}
-            placeholder="e.g. Crystallizer CR-04 (2,500 L)"
+            placeholder="e.g. CR-04 (2,500 L)"
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-1">
           <label className="form-label">
-            Affected Quantity / Batch Scale
+            Affected Quantity
             <Badge type="provenance" value={inv.field_provenance.affected_quantity?.source} />
           </label>
           <input
@@ -90,7 +88,7 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.affected_quantity || ""}
             onChange={(e) => dispatch(updateField({ field: "affected_quantity", value: e.target.value }))}
-            placeholder="e.g. 480 kg (Bulk API Crystalline Powder, Lots 1-4)"
+            placeholder="e.g. 480 kg (Bulk API)"
           />
         </div>
       </div>

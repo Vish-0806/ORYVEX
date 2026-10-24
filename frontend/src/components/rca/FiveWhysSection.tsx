@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { GitBranch, Network, AlertTriangle, CheckCircle2, ChevronRight, HelpCircle } from "lucide-react";
+import { GitBranch, Network, AlertTriangle, CheckCircle2, ChevronRight, HelpCircle, Sparkles } from "lucide-react";
 import { RootState } from "../../app/store";
 import { updateFiveWhysStep } from "../../features/rca/rcaSlice";
 import { FiveWhysStep } from "../../types/rca";
@@ -76,11 +76,68 @@ export const FiveWhysSection: React.FC = () => {
       ) : (
         <>
           {steps.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "2.5rem 1.5rem", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--turq-50)", borderRadius: "8px", border: "1px dashed var(--turq-300)" }}>
-              <GitBranch size={32} color="var(--turq-500)" style={{ margin: "0 auto 0.75rem", display: "block" }} />
-              <strong>No 5 Whys analysis performed yet.</strong>
-              <div style={{ marginTop: "0.35rem" }}>
-                Click <strong>"Run 5 Whys & CAPA"</strong> in the top toolbar or prompt the AI Copilot to construct causal chains based on registered evidence.
+            <div
+              style={{
+                background: "linear-gradient(180deg, #ffffff 0%, var(--turq-50) 100%)",
+                border: "1.5px solid var(--turq-300)",
+                borderRadius: "12px",
+                padding: "1.75rem 1.5rem",
+                boxShadow: "inset 0 0 20px rgba(6, 182, 212, 0.05)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+                <div>
+                  <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <GitBranch size={18} color="var(--turq-600)" />
+                    5 Whys Causal Ladder Methodology
+                  </div>
+                  <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                    Progressively penetrates from the immediate physical defect to systemic, procedural, and equipment root vulnerabilities.
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-turq-glow btn-sm"
+                  onClick={() => {
+                    const runBtn = document.querySelector("#sec-toolbar button.btn-turq-glow") as HTMLButtonElement;
+                    if (runBtn) runBtn.click();
+                  }}
+                >
+                  <Sparkles size={14} />
+                  Construct 5 Whys Chain
+                </button>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {[
+                  { level: "Why #1 (Direct Symptom)", desc: "Why did the API fail acceptance limits? (e.g., Elevated Impurity D-7 level)" },
+                  { level: "Why #2 (Physical Condition)", desc: "Why was Impurity D-7 formed? (e.g., Crystallization slurry plateaued at 44.5°C)" },
+                  { level: "Why #3 (Equipment State)", desc: "Why did temperature plateau? (e.g., Flow control valve FV-309 intermittent alarm)" },
+                  { level: "Why #4 (Maintenance/Inspection)", desc: "Why did the valve fail? (e.g., Chilling circuit seal wear not caught in PM)" },
+                  { level: "Why #5 (Root Systemic Cause)", desc: "Why was wear missed? (e.g., Predictive vibration/thermal monitoring gap in SOP)" },
+                ].map((step, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.75rem",
+                      background: "#ffffff",
+                      border: "1px solid var(--border-subtle)",
+                      borderRadius: "6px",
+                      padding: "0.55rem 0.85rem",
+                      fontSize: "0.76rem",
+                    }}
+                  >
+                    <span style={{ fontFamily: "JetBrains Mono", fontWeight: 800, color: "var(--turq-700)", background: "var(--turq-50)", padding: "0.15rem 0.5rem", borderRadius: "4px", minWidth: "170px" }}>
+                      {step.level}
+                    </span>
+                    <span style={{ color: "var(--ocean-950)", fontWeight: 500 }}>
+                      {step.desc}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ) : (

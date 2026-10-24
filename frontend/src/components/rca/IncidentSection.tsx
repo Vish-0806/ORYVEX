@@ -115,8 +115,8 @@ export const IncidentSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid-2">
-        <div className="form-group">
+      <div className="grid-4" style={{ marginTop: "1rem" }}>
+        <div className="form-group col-span-2">
           <label className="form-label">
             Immediate Containment Actions
             <Badge type="provenance" value={inv.field_provenance.immediate_containment?.source} />
@@ -129,7 +129,7 @@ export const IncidentSection: React.FC = () => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Potential Product Quality Impact
             <Badge type="provenance" value={inv.field_provenance.potential_impact?.source} />
@@ -141,10 +141,8 @@ export const IncidentSection: React.FC = () => {
             placeholder="Stability risks, crystal morphology impact, pharmacopeial compliance..."
           />
         </div>
-      </div>
 
-      <div className="grid-2" style={{ marginTop: "0.5rem" }}>
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Initial Severity Level
             <Badge type="provenance" value={inv.field_provenance.initial_severity?.source} />
@@ -160,7 +158,7 @@ export const IncidentSection: React.FC = () => {
           </select>
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Severity Rationale
             <Badge type="provenance" value={inv.field_provenance.severity_rationale?.source} />

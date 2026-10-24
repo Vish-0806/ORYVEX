@@ -28,14 +28,14 @@ class GroqService:
         messages: list,
         response_json: bool = True,
         temperature: float = 0.1,
-        max_tokens: int = 1800
+        max_tokens: int = 3500
     ) -> Dict[str, Any]:
         """
         Execute Groq chat completion with retries, model fallback, and JSON parsing.
         """
         attempts = 0
         last_error = None
-        models_to_try = [self.model, "openai/gpt-oss-120b", "qwen/qwen3.8-27b"]
+        models_to_try = [self.model, "llama-3.3-70b-versatile", "openai/gpt-oss-120b", "gemma2-9b-it", "qwen/qwen3.8-27b"]
         # Remove duplicates while preserving order
         candidate_models = list(dict.fromkeys(models_to_try))
         current_model_idx = 0

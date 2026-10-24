@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { CheckSquare, Plus, Trash2, CheckCircle2, AlertCircle, Clock, UserCheck } from "lucide-react";
+import { CheckSquare, Plus, Trash2, CheckCircle2, AlertCircle, Clock, UserCheck, Sparkles } from "lucide-react";
 import { RootState } from "../../app/store";
 import { updateCapaAction, removeCapaAction } from "../../features/rca/rcaSlice";
 import { CapaAction } from "../../types/rca";
@@ -135,11 +135,85 @@ export const CapaSection: React.FC = () => {
       )}
 
       {capas.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "2rem 1.5rem", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--turq-50)", borderRadius: "8px", border: "1px dashed var(--turq-300)" }}>
-          <CheckSquare size={28} color="var(--turq-500)" style={{ margin: "0 auto 0.5rem", display: "block" }} />
-          <strong>No CAPA actions defined yet.</strong>
-          <div style={{ marginTop: "0.25rem" }}>
-            Run the investigation analysis to generate justified Corrective and Preventive actions linked directly to confirmed root causes.
+        <div
+          style={{
+            background: "linear-gradient(180deg, #ffffff 0%, var(--turq-50) 100%)",
+            border: "1.5px solid var(--turq-300)",
+            borderRadius: "12px",
+            padding: "1.75rem 1.5rem",
+            boxShadow: "inset 0 0 20px rgba(6, 182, 212, 0.05)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+            <div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <CheckSquare size={18} color="var(--turq-600)" />
+                21 CFR 211.192 CAPA Strategy & Action Framework
+              </div>
+              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                GMP compliance requires pairing immediate containment actions with long-term preventive engineering controls.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-turq-glow btn-sm"
+              onClick={() => {
+                const runBtn = document.querySelector("#sec-toolbar button.btn-turq-glow") as HTMLButtonElement;
+                if (runBtn) runBtn.click();
+              }}
+            >
+              <Sparkles size={14} />
+              Generate AI CAPAs
+            </button>
+          </div>
+
+          <div className="grid-2">
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1.5px solid rgba(6, 182, 212, 0.3)",
+                borderLeft: "4px solid var(--turq-500)",
+                borderRadius: "8px",
+                padding: "1rem",
+                boxShadow: "0 2px 6px rgba(6, 182, 212, 0.08)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.35rem" }}>
+                <span className="badge badge-turq" style={{ fontSize: "0.72rem" }}>
+                  Corrective Pillar
+                </span>
+                <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "var(--ocean-950)" }}>
+                  Immediate Containment
+                </span>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+                Physical & ERP quarantine of implicated API batches, tagging out compromised equipment, and executing immediate remedial cleanings or repairs.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: "#ffffff",
+                border: "1.5px solid rgba(16, 185, 129, 0.3)",
+                borderLeft: "4px solid #10b981",
+                borderRadius: "8px",
+                padding: "1rem",
+                boxShadow: "0 2px 6px rgba(16, 185, 129, 0.08)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.35rem" }}>
+                <span className="badge badge-emerald" style={{ fontSize: "0.72rem" }}>
+                  Preventive Pillar
+                </span>
+                <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "#065f46" }}>
+                  Systemic Recurrence Elimination
+                </span>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+                Preventive maintenance schedules, metrology calibration interval updates, SOP revisions, operator retraining, and consecutive 3-batch verification protocols.
+              </p>
+            </div>
           </div>
         </div>
       ) : (

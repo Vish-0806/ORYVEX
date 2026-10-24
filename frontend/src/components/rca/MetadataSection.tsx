@@ -20,8 +20,8 @@ export const MetadataSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid-3">
-        <div className="form-group">
+      <div className="grid-4">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Department
             <Badge type="provenance" value={inv.field_provenance.department?.source} />
@@ -35,7 +35,7 @@ export const MetadataSection: React.FC = () => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Lead Investigator / Owner
             <Badge type="provenance" value={inv.field_provenance.investigation_owner?.source} />
@@ -49,7 +49,7 @@ export const MetadataSection: React.FC = () => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-2">
           <label className="form-label">
             Source Intake Channel
             <Badge type="provenance" value={inv.field_provenance.source_type?.source} />
@@ -64,12 +64,10 @@ export const MetadataSection: React.FC = () => {
             <option value="email">Quality Assurance Email Alert</option>
           </select>
         </div>
-      </div>
 
-      <div className="grid-2" style={{ marginTop: "0.5rem" }}>
-        <div className="form-group">
+        <div className="form-group col-span-1">
           <label className="form-label">
-            Incident Occurrence Date
+            Incident Date
             <Badge type="provenance" value={inv.field_provenance.incident_date?.source} />
           </label>
           <input
@@ -77,13 +75,13 @@ export const MetadataSection: React.FC = () => {
             className="form-input"
             value={inv.incident_date || ""}
             onChange={(e) => dispatch(updateField({ field: "incident_date", value: e.target.value }))}
-            placeholder="YYYY-MM-DD or date string"
+            placeholder="YYYY-MM-DD"
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group col-span-1">
           <label className="form-label">
-            Date Discovered / Reported
+            Date Discovered
             <Badge type="provenance" value={inv.field_provenance.date_discovered?.source} />
           </label>
           <input
@@ -91,7 +89,7 @@ export const MetadataSection: React.FC = () => {
             className="form-input"
             value={inv.date_discovered || ""}
             onChange={(e) => dispatch(updateField({ field: "date_discovered", value: e.target.value }))}
-            placeholder="YYYY-MM-DD or date string"
+            placeholder="YYYY-MM-DD"
           />
         </div>
       </div>

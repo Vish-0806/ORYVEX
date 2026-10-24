@@ -122,7 +122,7 @@ export const ReviewSection: React.FC = () => {
         </div>
       </div>
 
-      <div className="form-group" style={{ marginTop: "0.5rem" }}>
+      <div className="form-group" style={{ marginTop: "1rem" }}>
         <label className="form-label">Formal Review Notes & Regulatory Disposition</label>
         <textarea
           className="form-textarea"

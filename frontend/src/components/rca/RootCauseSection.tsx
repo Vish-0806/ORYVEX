@@ -55,11 +55,66 @@ export const RootCauseSection: React.FC = () => {
       </div>
 
       {hypotheses.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "2rem 1.5rem", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--turq-50)", borderRadius: "8px", border: "1px dashed var(--turq-300)" }}>
-          <Crosshair size={28} color="var(--turq-500)" style={{ margin: "0 auto 0.5rem", display: "block" }} />
-          <strong>No root cause hypotheses formulated yet.</strong>
-          <div style={{ marginTop: "0.25rem" }}>
-            Click <strong>"Run 5 Whys & CAPA"</strong> in the top toolbar to map anomalies against Ishikawa 6M dimensions.
+        <div
+          style={{
+            background: "linear-gradient(180deg, #ffffff 0%, var(--turq-50) 100%)",
+            border: "1.5px solid var(--turq-300)",
+            borderRadius: "12px",
+            padding: "1.75rem 1.5rem",
+            boxShadow: "inset 0 0 20px rgba(6, 182, 212, 0.05)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem", flexWrap: "wrap", gap: "0.75rem" }}>
+            <div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Crosshair size={18} color="var(--turq-600)" />
+                Ishikawa 6M Causal Discovery Framework
+              </div>
+              <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                AI analyzes registered evidence across all 6 pharmaceutical manufacturing dimensions to isolate probable root causes.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-turq-glow btn-sm"
+              onClick={() => {
+                const runBtn = document.querySelector("#sec-toolbar button.btn-turq-glow") as HTMLButtonElement;
+                if (runBtn) runBtn.click();
+              }}
+            >
+              <Sparkles size={14} />
+              Run 5 Whys & Causal Discovery
+            </button>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem" }}>
+            {[
+              { cat: "Machine", desc: "Sensors, chillers, valves, agitators, calibrations" },
+              { cat: "Method", desc: "Batch recipe, cooling curve kinetics, SOP execution" },
+              { cat: "Material", desc: "Raw reagents, solvents, CoA conformance, vendor lots" },
+              { cat: "Measurement", desc: "HPLC analytical drift, column resolution, baseline noise" },
+              { cat: "Man", desc: "Shift handover, operator training, manual overrides" },
+              { cat: "Environment", desc: "Cleanroom humidity, HVAC differential pressure, utilities" },
+            ].map((p) => (
+              <div
+                key={p.cat}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid var(--border-medium)",
+                  borderRadius: "8px",
+                  padding: "0.75rem 0.9rem",
+                  boxShadow: "0 1px 3px rgba(6, 182, 212, 0.08)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "var(--turq-800)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "0.2rem" }}>
+                  {p.cat}
+                </div>
+                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", lineHeight: 1.35 }}>
+                  {p.desc}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ) : (
