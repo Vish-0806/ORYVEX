@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { CheckSquare, Plus, Trash2 } from "lucide-react";
+import { CheckSquare, Plus, Trash2, CheckCircle2, AlertCircle, Clock, UserCheck } from "lucide-react";
 import { RootState } from "../../app/store";
 import { updateCapaAction, removeCapaAction } from "../../features/rca/rcaSlice";
 import { CapaAction } from "../../types/rca";
@@ -37,26 +37,37 @@ export const CapaSection: React.FC = () => {
     setShowAdd(false);
   };
 
+  const approvedCount = capas.filter((c) => c.review_status === "Approved").length;
+
   return (
-    <div className="form-section-card">
+    <div className="form-section-card" id="sec-capa">
       <div className="section-header">
         <div className="section-title">
-          <CheckSquare size={18} color="var(--emerald-600)" />
+          <CheckSquare size={18} color="var(--turq-600)" />
           Section G: CAPA Recommendations & Effectiveness Verification ({capas.length})
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={() => setShowAdd(!showAdd)}>
-          <Plus size={14} /> Add CAPA Action
-        </button>
+
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          {approvedCount > 0 && (
+            <span className="badge badge-emerald" style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+              <CheckCircle2 size={13} /> {approvedCount} QA Approved
+            </span>
+          )}
+
+          <button className="btn btn-secondary btn-sm" onClick={() => setShowAdd(!showAdd)}>
+            <Plus size={14} /> Add CAPA Action
+          </button>
+        </div>
       </div>
 
       {showAdd && (
-        <div style={{ background: "#f8fafc", padding: "1rem", borderRadius: "8px", border: "1px solid #e2e8f0", marginBottom: "1rem" }}>
+        <div style={{ background: "var(--turq-50)", padding: "1.2rem", borderRadius: "10px", border: "1px solid var(--turq-200)", marginBottom: "1.2rem" }}>
           <div className="grid-3">
             <div className="form-group">
               <label className="form-label">Action Type</label>
               <select className="form-select" value={newType} onChange={(e) => setNewType(e.target.value as any)}>
-                <option value="Corrective">Corrective Action (Immediate Fix/Containment)</option>
-                <option value="Preventive">Preventive Action (Systemic/Recurrence Prevention)</option>
+                <option value="Corrective">Corrective Action (Immediate Containment)</option>
+                <option value="Preventive">Preventive Action (Systemic Recurrence Prevention)</option>
               </select>
             </div>
 
@@ -124,93 +135,117 @@ export const CapaSection: React.FC = () => {
       )}
 
       {capas.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: "0.85rem" }}>
-          No CAPA actions defined yet. Run the investigation analysis to generate justified Corrective and Preventive actions based on identified root causes.
+        <div style={{ textAlign: "center", padding: "2rem 1.5rem", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--turq-50)", borderRadius: "8px", border: "1px dashed var(--turq-300)" }}>
+          <CheckSquare size={28} color="var(--turq-500)" style={{ margin: "0 auto 0.5rem", display: "block" }} />
+          <strong>No CAPA actions defined yet.</strong>
+          <div style={{ marginTop: "0.25rem" }}>
+            Run the investigation analysis to generate justified Corrective and Preventive actions linked directly to confirmed root causes.
+          </div>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          {capas.map((capa) => (
-            <div
-              key={capa.id}
-              style={{
-                border: "1px solid #e2e8f0",
-                borderRadius: "8px",
-                padding: "1rem",
-                background: "#ffffff",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <span style={{ fontFamily: "JetBrains Mono", fontWeight: 700, fontSize: "0.8rem", color: "#0f172a" }}>
-                    {capa.id}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.72rem",
-                      fontWeight: 600,
-                      padding: "0.1rem 0.5rem",
-                      borderRadius: "4px",
-                      background: capa.action_type === "Corrective" ? "var(--amber-50)" : "var(--emerald-50)",
-                      color: capa.action_type === "Corrective" ? "var(--amber-600)" : "var(--emerald-600)",
-                      border: "1px solid",
-                      borderColor: capa.action_type === "Corrective" ? "var(--amber-100)" : "var(--emerald-100)",
-                    }}
-                  >
-                    {capa.action_type}
-                  </span>
-                  {capa.suggested_role && (
-                    <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
-                      Role: {capa.suggested_role}
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+          {capas.map((capa) => {
+            const isApproved = capa.review_status === "Approved";
+            const isCorrective = capa.action_type === "Corrective";
+
+            return (
+              <div
+                key={capa.id}
+                style={{
+                  border: isApproved ? "1.5px solid #10b981" : "1px solid var(--border)",
+                  borderLeft: isCorrective ? "4px solid var(--turq-500)" : "4px solid #10b981",
+                  borderRadius: "10px",
+                  padding: "1.1rem",
+                  background: isApproved ? "linear-gradient(to right, #f0fdf4, #ffffff)" : "#ffffff",
+                  boxShadow: "var(--shadow-sm)",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                    <span style={{ fontFamily: "JetBrains Mono", fontWeight: 800, fontSize: "0.8rem", color: "var(--ocean-950)" }}>
+                      {capa.id}
                     </span>
-                  )}
-                  {capa.suggested_timeframe && (
-                    <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
-                      Timeframe: {capa.suggested_timeframe}
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.15rem 0.55rem",
+                        borderRadius: "5px",
+                        background: isCorrective ? "rgba(6, 182, 212, 0.12)" : "rgba(16, 185, 129, 0.12)",
+                        color: isCorrective ? "var(--turq-700)" : "#059669",
+                        border: isCorrective ? "1px solid var(--turq-300)" : "1px solid #a7f3d0",
+                      }}
+                    >
+                      {capa.action_type} Action
                     </span>
-                  )}
+                    {capa.suggested_role && (
+                      <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                        <UserCheck size={12} /> {capa.suggested_role}
+                      </span>
+                    )}
+                    {capa.suggested_timeframe && (
+                      <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                        <Clock size={12} /> {capa.suggested_timeframe}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <button
+                      type="button"
+                      onClick={() => dispatch(updateCapaAction({ ...capa, review_status: isApproved ? "Awaiting Review" : "Approved" }))}
+                      style={{
+                        background: isApproved ? "#10b981" : "transparent",
+                        color: isApproved ? "#ffffff" : "#059669",
+                        border: "1px solid #10b981",
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.2rem 0.55rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <CheckCircle2 size={12} />
+                      {isApproved ? "Approved" : "Approve"}
+                    </button>
+
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      style={{ padding: "0.2rem 0.4rem" }}
+                      onClick={() => dispatch(removeCapaAction(capa.id))}
+                      title="Remove CAPA"
+                    >
+                      <Trash2 size={13} color="#ef4444" />
+                    </button>
+                  </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <select
-                    className="form-select"
-                    style={{ width: "auto", padding: "0.2rem 0.5rem", fontSize: "0.72rem" }}
-                    value={capa.review_status}
-                    onChange={(e) => dispatch(updateCapaAction({ ...capa, review_status: e.target.value as any }))}
-                  >
-                    <option value="Awaiting Review">Awaiting Review</option>
-                    <option value="Approved">Approved by QA</option>
-                    <option value="Needs Revision">Needs Revision</option>
-                  </select>
-
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    style={{ padding: "0.2rem 0.4rem" }}
-                    onClick={() => dispatch(removeCapaAction(capa.id))}
-                  >
-                    <Trash2 size={13} color="#e11d48" />
-                  </button>
+                <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--ocean-950)", marginBottom: "0.35rem" }}>
+                  {capa.description}
                 </div>
+
+                {capa.rationale && (
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-main)", marginBottom: "0.4rem", lineHeight: 1.5 }}>
+                    <strong style={{ color: "var(--turq-800)" }}>Causal Rationale:</strong> {capa.rationale}
+                  </div>
+                )}
+
+                {capa.effectiveness_verification && (
+                  <div style={{ fontSize: "0.78rem", background: "linear-gradient(to right, #f0fdf4, #ffffff)", padding: "0.5rem 0.75rem", borderRadius: "6px", color: "#166534", border: "1px solid #bbf7d0", marginTop: "0.4rem" }}>
+                    <strong style={{ color: "#15803d" }}>Effectiveness Verification Protocol:</strong> {capa.effectiveness_verification}
+                  </div>
+                )}
               </div>
-
-              <div style={{ fontSize: "0.88rem", fontWeight: 600, color: "#0f172a", marginBottom: "0.25rem" }}>
-                {capa.description}
-              </div>
-
-              {capa.rationale && (
-                <div style={{ fontSize: "0.8rem", color: "#475569", marginBottom: "0.25rem" }}>
-                  <strong>Rationale:</strong> {capa.rationale}
-                </div>
-              )}
-
-              {capa.effectiveness_verification && (
-                <div style={{ fontSize: "0.78rem", background: "#f0fdf4", padding: "0.4rem 0.6rem", borderRadius: "4px", color: "#166534", border: "1px solid #bbf7d0", marginTop: "0.35rem" }}>
-                  <strong>Verification Method:</strong> {capa.effectiveness_verification}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 };
+

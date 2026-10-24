@@ -10,18 +10,20 @@ export const ManufacturingSection: React.FC = () => {
   const inv = useSelector((state: RootState) => state.rca.currentInvestigation);
 
   return (
-    <div className="form-section-card">
+    <div className="form-section-card" id="sec-manufacturing">
       <div className="section-header">
         <div className="section-title">
-          <Factory size={18} color="var(--cyan-600)" />
-          Section B: Product & Manufacturing Context
+          <div className="section-title-icon">
+            <Factory size={16} />
+          </div>
+          Section B: Product & API Manufacturing Context
         </div>
       </div>
 
       <div className="grid-3">
         <div className="form-group">
           <label className="form-label">
-            API / Product Name
+            Active Pharmaceutical Ingredient (API)
             <Badge type="provenance" value={inv.field_provenance.product_name?.source} />
           </label>
           <input
@@ -29,18 +31,19 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.product_name || ""}
             onChange={(e) => dispatch(updateField({ field: "product_name", value: e.target.value }))}
-            placeholder="e.g. Artemicort API"
+            placeholder="e.g. Artemicort API (Glucocorticoid Intermediate)"
           />
         </div>
 
         <div className="form-group">
           <label className="form-label">
-            Batch Number
+            Batch / Lot Number
             <Badge type="provenance" value={inv.field_provenance.batch_number?.source} />
           </label>
           <input
             type="text"
             className="form-input"
+            style={{ fontFamily: "JetBrains Mono", fontWeight: 600 }}
             value={inv.batch_number || ""}
             onChange={(e) => dispatch(updateField({ field: "batch_number", value: e.target.value }))}
             placeholder="e.g. ART-2026-042"
@@ -49,7 +52,7 @@ export const ManufacturingSection: React.FC = () => {
 
         <div className="form-group">
           <label className="form-label">
-            Manufacturing Stage
+            Manufacturing Unit Operation
             <Badge type="provenance" value={inv.field_provenance.manufacturing_stage?.source} />
           </label>
           <input
@@ -57,7 +60,7 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.manufacturing_stage || ""}
             onChange={(e) => dispatch(updateField({ field: "manufacturing_stage", value: e.target.value }))}
-            placeholder="e.g. Stage 3 Crystallization"
+            placeholder="e.g. Stage 3 Crystallization & Solvent Recovery"
           />
         </div>
       </div>
@@ -65,7 +68,7 @@ export const ManufacturingSection: React.FC = () => {
       <div className="grid-2" style={{ marginTop: "0.5rem" }}>
         <div className="form-group">
           <label className="form-label">
-            Equipment Identifier
+            Process Equipment Tag
             <Badge type="provenance" value={inv.field_provenance.equipment_id?.source} />
           </label>
           <input
@@ -73,13 +76,13 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.equipment_id || ""}
             onChange={(e) => dispatch(updateField({ field: "equipment_id", value: e.target.value }))}
-            placeholder="e.g. Crystallizer CR-04"
+            placeholder="e.g. Crystallizer CR-04 (2,500 L)"
           />
         </div>
 
         <div className="form-group">
           <label className="form-label">
-            Affected Quantity / Lot Size
+            Affected Quantity / Batch Scale
             <Badge type="provenance" value={inv.field_provenance.affected_quantity?.source} />
           </label>
           <input
@@ -87,7 +90,7 @@ export const ManufacturingSection: React.FC = () => {
             className="form-input"
             value={inv.affected_quantity || ""}
             onChange={(e) => dispatch(updateField({ field: "affected_quantity", value: e.target.value }))}
-            placeholder="e.g. 480 kg (Bulk API Crystalline Powder)"
+            placeholder="e.g. 480 kg (Bulk API Crystalline Powder, Lots 1-4)"
           />
         </div>
       </div>

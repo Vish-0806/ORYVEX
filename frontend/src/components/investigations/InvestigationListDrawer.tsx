@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { X, Search, Database, Clock, RefreshCw } from "lucide-react";
+import { X, Search, Database, Clock, RefreshCw, ChevronRight } from "lucide-react";
 import { RootState } from "../../app/store";
 import { 
   setDrawerOpen, 
@@ -52,15 +52,22 @@ export const InvestigationListDrawer: React.FC = () => {
     <div className="drawer-backdrop" onClick={() => dispatch(setDrawerOpen(false))}>
       <div className="drawer-content" onClick={(e) => e.stopPropagation()}>
         {/* Drawer Header */}
-        <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Database size={18} color="var(--violet-600)" />
-            <h2 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--navy-900)" }}>
-              Saved Investigations (PostgreSQL)
-            </h2>
+        <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "linear-gradient(to right, var(--ocean-950), var(--ocean-900))" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <div style={{ width: 30, height: 30, borderRadius: 6, background: "var(--turq-500)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+              <Database size={16} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: "1rem", fontWeight: 800, color: "#ffffff" }}>
+                Saved Investigations
+              </h2>
+              <div style={{ fontSize: "0.7rem", color: "var(--turq-300)" }}>
+                PostgreSQL 18 Audited Quality Records
+              </div>
+            </div>
           </div>
           <button
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--turq-300)" }}
             onClick={() => dispatch(setDrawerOpen(false))}
           >
             <X size={20} />
@@ -68,9 +75,9 @@ export const InvestigationListDrawer: React.FC = () => {
         </div>
 
         {/* Filter and Search Bar */}
-        <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", display: "flex", gap: "0.75rem" }}>
+        <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid var(--border)", background: "var(--turq-50)", display: "flex", gap: "0.75rem" }}>
           <div style={{ position: "relative", flex: 1 }}>
-            <Search size={15} style={{ position: "absolute", left: "10px", top: "10px", color: "#94a3b8" }} />
+            <Search size={15} style={{ position: "absolute", left: "10px", top: "10px", color: "var(--turq-600)" }} />
             <input
               type="text"
               className="form-input"
@@ -96,15 +103,15 @@ export const InvestigationListDrawer: React.FC = () => {
           </select>
 
           <button className="btn btn-secondary btn-sm" onClick={fetchItems} title="Refresh records">
-            <RefreshCw size={14} />
+            <RefreshCw size={14} color="var(--turq-700)" />
           </button>
         </div>
 
         {/* List Content */}
         <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
           {isLoading && (
-            <div style={{ textAlign: "center", padding: "2rem", color: "#64748b" }}>
-              <RefreshCw size={20} className="spin" style={{ margin: "0 auto 0.5rem auto" }} />
+            <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
+              <RefreshCw size={20} className="spin" color="var(--turq-600)" style={{ margin: "0 auto 0.5rem auto" }} />
               Loading records from PostgreSQL...
             </div>
           )}
@@ -116,9 +123,9 @@ export const InvestigationListDrawer: React.FC = () => {
           )}
 
           {!isLoading && items.length === 0 && !error && (
-            <div style={{ textAlign: "center", padding: "3rem 1.5rem", color: "#94a3b8" }}>
-              <Database size={32} style={{ margin: "0 auto 0.75rem auto", opacity: 0.5 }} />
-              <div style={{ fontWeight: 600, color: "#475569" }}>No saved investigations found</div>
+            <div style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
+              <Database size={32} color="var(--turq-400)" style={{ margin: "0 auto 0.75rem auto" }} />
+              <div style={{ fontWeight: 700, color: "var(--ocean-950)" }}>No saved investigations found</div>
               <div style={{ fontSize: "0.8rem", marginTop: "0.25rem" }}>
                 Investigations saved to PostgreSQL will appear in this registry.
               </div>
@@ -130,45 +137,54 @@ export const InvestigationListDrawer: React.FC = () => {
               key={item.id}
               onClick={() => handleSelectInvestigation(item.id)}
               style={{
-                border: "1px solid #e2e8f0",
+                border: "1.5px solid var(--border)",
                 borderRadius: "8px",
                 padding: "1rem",
                 background: "#ffffff",
                 cursor: "pointer",
                 transition: "all 0.15s ease",
+                boxShadow: "var(--shadow-sm)",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--violet-600)")}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "var(--turq-500)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(6, 182, 212, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+              }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
-                <span style={{ fontFamily: "JetBrains Mono", fontSize: "0.78rem", fontWeight: 700, color: "var(--navy-900)" }}>
+                <span style={{ fontFamily: "JetBrains Mono", fontSize: "0.78rem", fontWeight: 700, color: "var(--ocean-950)" }}>
                   {item.id}
                 </span>
                 <Badge type="status" value={item.status} />
               </div>
 
-              <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--navy-900)", marginBottom: "0.25rem" }}>
+              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ocean-950)", marginBottom: "0.25rem" }}>
                 {item.title}
               </div>
 
-              <div style={{ display: "flex", gap: "1rem", fontSize: "0.78rem", color: "#64748b" }}>
-                {item.product_name && <span>API: <strong>{item.product_name}</strong></span>}
-                {item.batch_number && <span>Batch: <strong>{item.batch_number}</strong></span>}
+              <div style={{ display: "flex", gap: "1rem", fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                {item.product_name && <span>API: <strong style={{ color: "var(--ocean-950)" }}>{item.product_name}</strong></span>}
+                {item.batch_number && <span>Batch: <strong style={{ color: "var(--ocean-950)" }}>{item.batch_number}</strong></span>}
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid #f1f5f9", fontSize: "0.72rem", color: "#94a3b8" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid var(--border)", fontSize: "0.72rem", color: "var(--text-muted)" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                   <Clock size={12} />
                   Updated: {new Date(item.updated_at).toLocaleString()}
                 </span>
-                <span style={{ color: "var(--violet-600)", fontWeight: 600 }}>Click to open &rarr;</span>
+                <span style={{ color: "var(--turq-700)", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                  Open Record <ChevronRight size={13} />
+                </span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Drawer Footer */}
-        <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between" }}>
+        <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
           <button
             className="btn btn-secondary"
             onClick={() => {
@@ -186,3 +202,4 @@ export const InvestigationListDrawer: React.FC = () => {
     </div>
   );
 };
+

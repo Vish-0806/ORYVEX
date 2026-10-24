@@ -1,10 +1,9 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Crosshair, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Crosshair, ShieldAlert, CheckCircle2, XCircle, Search, Sparkles } from "lucide-react";
 import { RootState } from "../../app/store";
 import { updateRootCauseConfirmation } from "../../features/rca/rcaSlice";
 import { CauseConfirmationStatus } from "../../types/rca";
-import { Badge } from "../common/Badge";
 
 export const RootCauseSection: React.FC = () => {
   const dispatch = useDispatch();
@@ -14,96 +13,175 @@ export const RootCauseSection: React.FC = () => {
     dispatch(updateRootCauseConfirmation({ id, status }));
   };
 
+  const confirmedCount = hypotheses.filter((h) => h.user_confirmation_status === "Confirmed by qualified reviewer").length;
+
   return (
-    <div className="form-section-card">
+    <div className="form-section-card" id="sec-rootcauses">
       <div className="section-header">
         <div className="section-title">
-          <Crosshair size={18} color="var(--violet-600)" />
+          <Crosshair size={18} color="var(--turq-600)" />
           Section F: Potential Root Cause Hypotheses & Human Review ({hypotheses.length})
         </div>
+
+        {confirmedCount > 0 ? (
+          <span className="badge badge-emerald" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <CheckCircle2 size={13} /> {confirmedCount} Confirmed Root Cause{confirmedCount > 1 ? "s" : ""}
+          </span>
+        ) : (
+          <span className="badge badge-turq">
+            Pending Qualified Sign-Off
+          </span>
+        )}
       </div>
 
-      <div style={{ background: "#f8fafc", padding: "0.6rem 0.85rem", borderRadius: "6px", fontSize: "0.78rem", color: "#475569", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem", border: "1px solid #e2e8f0" }}>
-        <ShieldAlert size={15} color="#6366f1" />
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(15, 23, 42, 0.03))",
+          padding: "0.75rem 1rem",
+          borderRadius: "8px",
+          fontSize: "0.78rem",
+          color: "var(--ocean-950)",
+          marginBottom: "1.2rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          border: "1px solid var(--turq-300)",
+        }}
+      >
+        <ShieldAlert size={18} color="var(--turq-600)" />
         <span>
-          <strong>Human Oversight Rule:</strong> AI-generated causes are strictly hypotheses. Only a qualified Quality Professional may confirm the actual root cause following physical evidence verification.
+          <strong>GMP Human Oversight Mandate:</strong> AI-generated causes are strictly exploratory suggestions. Under EU/FDA cGMP Annex 11, only a qualified QA reviewer may affirm a causal mechanism after validating supporting records.
         </span>
       </div>
 
       {hypotheses.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "1.5rem", color: "#94a3b8", fontSize: "0.85rem" }}>
-          No root cause hypotheses formulated yet. Run analysis to identify potential contributing factors across Ishikawa 6M categories (Machine, Method, Material, Measurement, Man, Environment).
+        <div style={{ textAlign: "center", padding: "2rem 1.5rem", color: "var(--text-muted)", fontSize: "0.85rem", background: "var(--turq-50)", borderRadius: "8px", border: "1px dashed var(--turq-300)" }}>
+          <Crosshair size={28} color="var(--turq-500)" style={{ margin: "0 auto 0.5rem", display: "block" }} />
+          <strong>No root cause hypotheses formulated yet.</strong>
+          <div style={{ marginTop: "0.25rem" }}>
+            Click <strong>"Run 5 Whys & CAPA"</strong> in the top toolbar to map anomalies against Ishikawa 6M dimensions.
+          </div>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {hypotheses.map((hyp) => (
-            <div
-              key={hyp.id}
-              style={{
-                border: "1px solid",
-                borderColor: hyp.user_confirmation_status === "Confirmed by qualified reviewer" ? "#10b981" : "#e2e8f0",
-                borderRadius: "8px",
-                padding: "1rem",
-                background: hyp.user_confirmation_status === "Confirmed by qualified reviewer" ? "#f0fdf4" : "#ffffff",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <span style={{ fontFamily: "JetBrains Mono", fontWeight: 700, fontSize: "0.8rem", color: "#0f172a" }}>
-                    {hyp.id}
-                  </span>
-                  <span style={{ fontSize: "0.72rem", background: "var(--navy-800)", color: "#fff", padding: "0.1rem 0.5rem", borderRadius: "4px" }}>
-                    Category: {hyp.category}
-                  </span>
-                  <span style={{ fontSize: "0.72rem", background: "var(--violet-50)", color: "var(--violet-600)", padding: "0.1rem 0.5rem", borderRadius: "4px", border: "1px solid var(--violet-100)" }}>
-                    AI Confidence: {hyp.confidence_label}
-                  </span>
+          {hypotheses.map((hyp) => {
+            const isConfirmed = hyp.user_confirmation_status === "Confirmed by qualified reviewer";
+            const isRejected = hyp.user_confirmation_status === "Rejected";
+
+            return (
+              <div
+                key={hyp.id}
+                style={{
+                  border: isConfirmed ? "2px solid #10b981" : isRejected ? "1px solid #fecaca" : "1.5px solid var(--border)",
+                  borderRadius: "10px",
+                  padding: "1.2rem",
+                  background: isConfirmed ? "linear-gradient(to right, #f0fdf4, #ffffff)" : isRejected ? "#fef2f2" : "#ffffff",
+                  boxShadow: isConfirmed ? "0 4px 15px rgba(16, 185, 129, 0.15)" : "var(--shadow-sm)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                    <span style={{ fontFamily: "JetBrains Mono", fontWeight: 800, fontSize: "0.8rem", color: "var(--ocean-950)" }}>
+                      {hyp.id}
+                    </span>
+                    <span style={{ fontSize: "0.72rem", background: "var(--ocean-950)", color: "var(--turq-300)", padding: "0.15rem 0.55rem", borderRadius: "5px", fontWeight: 700 }}>
+                      6M Branch: {hyp.category}
+                    </span>
+                    <span style={{ fontSize: "0.72rem", background: "var(--turq-50)", color: "var(--turq-800)", padding: "0.15rem 0.55rem", borderRadius: "5px", border: "1px solid var(--turq-200)", fontWeight: 600 }}>
+                      AI Confidence: {hyp.confidence_label}
+                    </span>
+                  </div>
+
+                  {/* Interactive Status Controls */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <button
+                      type="button"
+                      onClick={() => handleStatusChange(hyp.id, "Confirmed by qualified reviewer")}
+                      style={{
+                        background: isConfirmed ? "#10b981" : "transparent",
+                        color: isConfirmed ? "#ffffff" : "#059669",
+                        border: "1px solid #10b981",
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.25rem 0.6rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        transition: "all 0.15s ease",
+                      }}
+                      title="Confirm this hypothesis as root cause"
+                    >
+                      <CheckCircle2 size={13} />
+                      {isConfirmed ? "Confirmed Root Cause" : "Confirm"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleStatusChange(hyp.id, "Rejected")}
+                      style={{
+                        background: isRejected ? "#ef4444" : "transparent",
+                        color: isRejected ? "#ffffff" : "#dc2626",
+                        border: "1px solid #ef4444",
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.25rem 0.5rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        transition: "all 0.15s ease",
+                      }}
+                      title="Rule out / reject hypothesis"
+                    >
+                      <XCircle size={13} />
+                      {isRejected ? "Rejected" : "Rule Out"}
+                    </button>
+
+                    <select
+                      className="form-select"
+                      style={{
+                        width: "auto",
+                        padding: "0.25rem 0.5rem",
+                        fontSize: "0.72rem",
+                        fontWeight: 600,
+                      }}
+                      value={hyp.user_confirmation_status}
+                      onChange={(e) => handleStatusChange(hyp.id, e.target.value as CauseConfirmationStatus)}
+                    >
+                      <option value="Suggested">Suggested</option>
+                      <option value="Under investigation">Under Investigation</option>
+                      <option value="Supported by reviewed evidence">Supported by Evidence</option>
+                      <option value="Confirmed by qualified reviewer">Confirmed</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#334155" }}>
-                    Confirmation Status:
-                  </span>
-                  <select
-                    className="form-select"
-                    style={{
-                      width: "auto",
-                      padding: "0.25rem 0.6rem",
-                      fontSize: "0.78rem",
-                      fontWeight: 600,
-                      borderColor: hyp.user_confirmation_status === "Confirmed by qualified reviewer" ? "#10b981" : undefined
-                    }}
-                    value={hyp.user_confirmation_status}
-                    onChange={(e) => handleStatusChange(hyp.id, e.target.value as CauseConfirmationStatus)}
-                  >
-                    <option value="Suggested">Suggested (AI Hypothesis)</option>
-                    <option value="Under investigation">Under Investigation</option>
-                    <option value="Supported by reviewed evidence">Supported by Reviewed Evidence</option>
-                    <option value="Confirmed by qualified reviewer">✓ Confirmed by Qualified Reviewer</option>
-                    <option value="Rejected">✗ Rejected (Rule Out)</option>
-                  </select>
+                <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ocean-950)", marginBottom: "0.45rem" }}>
+                  {hyp.description}
                 </div>
+
+                {hyp.reasoning && (
+                  <div style={{ fontSize: "0.82rem", color: "var(--text-main)", marginBottom: "0.6rem", lineHeight: 1.5, background: "rgba(6, 182, 212, 0.04)", padding: "0.6rem 0.8rem", borderRadius: "6px", borderLeft: "3px solid var(--turq-500)" }}>
+                    <strong style={{ color: "var(--turq-800)" }}>Causal Mechanism:</strong> {hyp.reasoning}
+                  </div>
+                )}
+
+                {hyp.evidence_needed && (
+                  <div style={{ fontSize: "0.78rem", background: "#fffbeb", padding: "0.5rem 0.75rem", borderRadius: "6px", border: "1px solid #fde68a", color: "#92400e" }}>
+                    <strong style={{ color: "#b45309" }}>Evidence Verification Requirement:</strong> {hyp.evidence_needed}
+                  </div>
+                )}
               </div>
-
-              <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#0f172a", marginBottom: "0.4rem" }}>
-                {hyp.description}
-              </div>
-
-              {hyp.reasoning && (
-                <div style={{ fontSize: "0.82rem", color: "#475569", marginBottom: "0.5rem", lineHeight: 1.5 }}>
-                  <strong>Causal Mechanism:</strong> {hyp.reasoning}
-                </div>
-              )}
-
-              {hyp.evidence_needed && (
-                <div style={{ fontSize: "0.78rem", background: "#f8fafc", padding: "0.5rem 0.75rem", borderRadius: "4px", border: "1px solid #e2e8f0", color: "#64748b" }}>
-                  <strong style={{ color: "#d97706" }}>Evidence Needed to Assess / Confirm:</strong> {hyp.evidence_needed}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 };
+

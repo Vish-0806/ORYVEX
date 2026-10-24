@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { FileText, Info } from "lucide-react";
+import { FileText } from "lucide-react";
 import { RootState } from "../../app/store";
 import { updateField } from "../../features/rca/rcaSlice";
 import { Badge } from "../common/Badge";
@@ -10,11 +10,13 @@ export const MetadataSection: React.FC = () => {
   const inv = useSelector((state: RootState) => state.rca.currentInvestigation);
 
   return (
-    <div className="form-section-card">
+    <div className="form-section-card" id="sec-metadata">
       <div className="section-header">
         <div className="section-title">
-          <FileText size={18} color="var(--violet-600)" />
-          Section A: Investigation Metadata
+          <div className="section-title-icon">
+            <FileText size={16} />
+          </div>
+          Section A: Investigation Metadata & Origin
         </div>
       </div>
 
@@ -29,13 +31,13 @@ export const MetadataSection: React.FC = () => {
             className="form-input"
             value={inv.department || ""}
             onChange={(e) => dispatch(updateField({ field: "department", value: e.target.value }))}
-            placeholder="e.g., Quality Control / Synthesis"
+            placeholder="e.g., Quality Control / Chemical Synthesis"
           />
         </div>
 
         <div className="form-group">
           <label className="form-label">
-            Investigation Owner
+            Lead Investigator / Owner
             <Badge type="provenance" value={inv.field_provenance.investigation_owner?.source} />
           </label>
           <input
@@ -43,13 +45,13 @@ export const MetadataSection: React.FC = () => {
             className="form-input"
             value={inv.investigation_owner || ""}
             onChange={(e) => dispatch(updateField({ field: "investigation_owner", value: e.target.value }))}
-            placeholder="Lead Investigator name/role"
+            placeholder="Lead Quality Specialist name/role"
           />
         </div>
 
         <div className="form-group">
           <label className="form-label">
-            Source Intake Type
+            Source Intake Channel
             <Badge type="provenance" value={inv.field_provenance.source_type?.source} />
           </label>
           <select
@@ -57,9 +59,9 @@ export const MetadataSection: React.FC = () => {
             value={inv.source_type || "pasted_text"}
             onChange={(e) => dispatch(updateField({ field: "source_type", value: e.target.value }))}
           >
-            <option value="pasted_text">Pasted Incident Text</option>
-            <option value="pdf">Digitally Rendered PDF</option>
-            <option value="email">Quality Email Alert</option>
+            <option value="pasted_text">Pasted Incident Narrative</option>
+            <option value="pdf">Digitally Rendered PDF Report</option>
+            <option value="email">Quality Assurance Email Alert</option>
           </select>
         </div>
       </div>
@@ -81,7 +83,7 @@ export const MetadataSection: React.FC = () => {
 
         <div className="form-group">
           <label className="form-label">
-            Date Discovered
+            Date Discovered / Reported
             <Badge type="provenance" value={inv.field_provenance.date_discovered?.source} />
           </label>
           <input

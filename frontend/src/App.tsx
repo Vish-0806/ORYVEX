@@ -1,5 +1,6 @@
 import React from "react";
 import { Header } from "./components/layout/Header";
+import { WorkflowStepper } from "./components/layout/WorkflowStepper";
 import { InvestigationHeader } from "./components/rca/InvestigationHeader";
 import { MetadataSection } from "./components/rca/MetadataSection";
 import { ManufacturingSection } from "./components/rca/ManufacturingSection";
@@ -17,6 +18,9 @@ export const App: React.FC = () => {
     <div className="app-container">
       {/* Top Enterprise Navigation */}
       <Header />
+
+      {/* Interactive Workflow Progress Stepper */}
+      <WorkflowStepper />
 
       {/* Main Two-Panel Workspace */}
       <main className="workspace-layout">
@@ -44,3 +48,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

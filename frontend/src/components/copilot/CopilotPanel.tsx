@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { 
   Bot, Send, Upload, FileText, CheckCircle, 
-  AlertCircle, Sparkles, RefreshCw, ArrowRight 
+  AlertCircle, Sparkles, RefreshCw, ArrowRight, Zap, ShieldCheck 
 } from "lucide-react";
 import { RootState } from "../../app/store";
 import { 
@@ -118,11 +118,11 @@ export const CopilotPanel: React.FC = () => {
           id: `msg-${Date.now()}`,
           role: "assistant",
           content: 
-            `**Extraction Completed.**\n\n` +
-            `• Successfully populated **${result.extracted_fields?.length || 0} fields** on the RCA form.\n` +
-            `• **${result.unknown_fields?.length || 0} fields** were absent in the source and preserved as unknown.\n` +
-            `• Identified **${result.initial_evidence?.length || 0} evidence records** (including missing record requests).\n\n` +
-            `*Next Step:* Review the populated fields, ask for corrections in chat, or trigger 5 Whys & CAPA analysis.`,
+            `**Extraction Completed Successfully.**\n\n` +
+            `• Populated **${result.extracted_fields?.length || 0} fields** on the RCA form.\n` +
+            `• Preserved **${result.unknown_fields?.length || 0} unstated fields** as unknown (zero-hallucination guarantee).\n` +
+            `• Identified **${result.initial_evidence?.length || 0} evidence records** (including missing data requests).\n\n` +
+            `*Recommended Next Action:* Inspect the highlighted missing records, command edits via chat, or click **"Run 5 Whys & CAPA"** to construct causal trees.`,
           timestamp: new Date().toISOString(),
           suggested_actions: [
             "Which evidence is missing?",
@@ -195,16 +195,19 @@ export const CopilotPanel: React.FC = () => {
     <div className="copilot-panel">
       {/* Copilot Header */}
       <div className="copilot-header">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <div style={{ width: 28, height: 28, borderRadius: 6, background: "var(--violet-600)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-            <Bot size={17} />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--turq-500)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 0 12px rgba(6, 182, 212, 0.4)" }}>
+            <Bot size={18} />
           </div>
           <div>
-            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--navy-900)" }}>
+            <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
               ORYVEX AI Copilot
+              <span style={{ fontSize: "0.65rem", padding: "0.1rem 0.4rem", borderRadius: "9999px", background: "rgba(6, 182, 212, 0.12)", color: "var(--turq-700)", fontWeight: 700, border: "1px solid var(--turq-300)" }}>
+                ONLINE
+              </span>
             </div>
-            <div style={{ fontSize: "0.72rem", color: "#64748b" }}>
-              Pharmaceutical Investigation Intelligence
+            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+              LangGraph + Groq Investigation Intelligence
             </div>
           </div>
         </div>
@@ -233,17 +236,18 @@ export const CopilotPanel: React.FC = () => {
           <div>
             <textarea
               className="form-textarea"
-              style={{ minHeight: "85px", fontSize: "0.8rem", marginBottom: "0.5rem" }}
+              style={{ minHeight: "90px", fontSize: "0.8rem", marginBottom: "0.6rem", borderColor: "var(--turq-300)" }}
               placeholder="Paste OOS lab notice, manufacturing deviation report, or quality email narrative..."
               value={pastedText}
               onChange={(e) => dispatch(setPastedText(e.target.value))}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={() => dispatch(setPastedText(FICTIONAL_DEMO_TEXT))}
                 title="Populate input with clearly identified fictional API batch scenario"
+                style={{ fontSize: "0.72rem" }}
               >
                 Load Fictional Impurity Incident
               </button>
@@ -262,21 +266,22 @@ export const CopilotPanel: React.FC = () => {
           <div>
             <div
               style={{
-                border: "2px dashed #cbd5e1",
-                borderRadius: "8px",
-                padding: "1rem",
+                border: "2px dashed var(--turq-400)",
+                borderRadius: "10px",
+                padding: "1.2rem",
                 textAlign: "center",
-                background: "#ffffff",
-                marginBottom: "0.5rem",
+                background: "var(--turq-50)",
+                marginBottom: "0.6rem",
                 cursor: "pointer",
+                transition: "all 0.15s ease",
               }}
               onClick={() => document.getElementById("pdf-file-input")?.click()}
             >
-              <Upload size={22} color="var(--violet-600)" style={{ margin: "0 auto 0.4rem auto" }} />
-              <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>
+              <Upload size={24} color="var(--turq-600)" style={{ margin: "0 auto 0.4rem auto" }} />
+              <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ocean-950)" }}>
                 {selectedFileName ? selectedFileName : "Click to select or drag PDF file"}
               </div>
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
                 Accepts digitally rendered PDF reports (Max 10MB)
               </div>
               <input
@@ -302,14 +307,14 @@ export const CopilotPanel: React.FC = () => {
         )}
 
         {isProcessing && (
-          <div style={{ marginTop: "0.6rem", padding: "0.5rem 0.75rem", background: "var(--violet-50)", borderRadius: "6px", fontSize: "0.78rem", color: "var(--violet-700)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{ marginTop: "0.6rem", padding: "0.6rem 0.85rem", background: "rgba(6, 182, 212, 0.08)", border: "1px solid var(--turq-300)", borderRadius: "8px", fontSize: "0.78rem", color: "var(--turq-800)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <RefreshCw size={14} className="spin" />
             <span>{processingStep || "Executing LangGraph AI workflow..."}</span>
           </div>
         )}
 
         {error && (
-          <div style={{ marginTop: "0.6rem", padding: "0.5rem 0.75rem", background: "#fff1f2", borderRadius: "6px", fontSize: "0.78rem", color: "#e11d48", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{ marginTop: "0.6rem", padding: "0.6rem 0.85rem", background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "8px", fontSize: "0.78rem", color: "#e11d48", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <AlertCircle size={14} />
             <span>{error}</span>
           </div>
@@ -318,14 +323,14 @@ export const CopilotPanel: React.FC = () => {
 
       {/* Extraction Summary Card */}
       {extractionMeta && (
-        <div style={{ padding: "0.75rem 1.25rem", background: "#f0fdfa", borderBottom: "1px solid #ccfbf1", fontSize: "0.78rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "#0f766e", fontWeight: 600, marginBottom: "0.2rem" }}>
-            <CheckCircle size={14} />
+        <div style={{ padding: "0.85rem 1.25rem", background: "linear-gradient(to right, #ecfeff, #ffffff)", borderBottom: "1px solid var(--turq-200)", fontSize: "0.78rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--turq-800)", fontWeight: 700, marginBottom: "0.25rem" }}>
+            <CheckCircle size={15} color="var(--turq-600)" />
             AI Extraction Summary
           </div>
-          <div style={{ color: "#334155" }}>{extractionMeta.summary}</div>
+          <div style={{ color: "var(--ocean-950)", fontWeight: 500 }}>{extractionMeta.summary}</div>
           {extractionMeta.missingNotices.length > 0 && (
-            <div style={{ marginTop: "0.3rem", color: "#d97706" }}>
+            <div style={{ marginTop: "0.35rem", color: "#b45309", background: "#fef3c7", padding: "0.25rem 0.5rem", borderRadius: "4px", border: "1px solid #fde68a", fontSize: "0.72rem" }}>
               <strong>Missing Records:</strong> {extractionMeta.missingNotices.join(", ")}
             </div>
           )}
@@ -344,11 +349,11 @@ export const CopilotPanel: React.FC = () => {
             {/* Structured Form Patch Visual Indicator */}
             {msg.patch && Object.keys(msg.patch).length > 0 && (
               <div className="chat-bubble-patch">
-                <div style={{ fontWeight: 600, color: "var(--violet-700)", marginBottom: "0.2rem" }}>
-                  ✓ Updated Structured RCA Form Fields:
+                <div style={{ fontWeight: 700, color: "var(--turq-800)", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <ShieldCheck size={13} color="var(--turq-600)" /> Updated Structured RCA Form Fields:
                 </div>
                 {Object.entries(msg.patch).map(([field, val]) => (
-                  <div key={field}>
+                  <div key={field} style={{ fontSize: "0.72rem", color: "var(--ocean-950)" }}>
                     <strong>{field}:</strong> {String(val)}
                   </div>
                 ))}
@@ -374,8 +379,10 @@ export const CopilotPanel: React.FC = () => {
 
         {isChatLoading && (
           <div className="chat-bubble chat-bubble-assistant" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <RefreshCw size={14} className="spin" />
-            <span style={{ fontSize: "0.8rem", color: "#64748b" }}>Thinking & analyzing investigation context...</span>
+            <RefreshCw size={14} className="spin" color="var(--turq-600)" />
+            <span style={{ fontSize: "0.8rem", color: "var(--turq-800)", fontWeight: 500 }}>
+              Analyzing investigation context via Groq...
+            </span>
           </div>
         )}
 
@@ -417,7 +424,7 @@ export const CopilotPanel: React.FC = () => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ padding: "0 0.8rem" }}
+            style={{ padding: "0 0.9rem" }}
             disabled={isChatLoading || !chatInput.trim()}
           >
             <Send size={15} />
@@ -427,3 +434,4 @@ export const CopilotPanel: React.FC = () => {
     </div>
   );
 };
+
