@@ -47,10 +47,29 @@ Expected JSON Schema:
 
 def build_rca_prompt(structured_incident: dict, evidence_register: list) -> list:
     import json
+    # Extract only essential incident context to save tokens and prevent TPM limits
+    compact_incident = {
+        "product": structured_incident.get("product_name"),
+        "batch": structured_incident.get("batch_number"),
+        "stage": structured_incident.get("manufacturing_stage"),
+        "equipment": structured_incident.get("equipment_id"),
+        "observed_defect": structured_incident.get("observed_result"),
+        "expected_spec": structured_incident.get("expected_specification") or structured_incident.get("expected_result"),
+        "timeline_details": structured_incident.get("detailed_description") or structured_incident.get("incident_summary"),
+        "severity": structured_incident.get("initial_severity")
+    }
+    compact_evidence = [
+        f"{e.get('id', 'EVD')}: {e.get('description', '')[:100]} ({e.get('evidence_status', 'Supplied')})"
+        for e in evidence_register[:8]
+    ]
+
+    user_msg = (
+        f"INCIDENT: {json.dumps(compact_incident)}\n"
+        f"KEY EVIDENCE:\n" + "\n".join(compact_evidence) +
+        "\n\nGenerate structured 5 Whys and 3-5 prioritized Ishikawa 6M root cause hypotheses in JSON format."
+    )
+
     return [
         {"role": "system", "content": RCA_SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": f"INCIDENT CONTEXT:\n{json.dumps(structured_incident, indent=2)}\n\nEVIDENCE REGISTER:\n{json.dumps(evidence_register, indent=2)}\n\nPerform the 5 Whys and Root Cause Hypothesis generation now according to the schema."
-        }
+        {"role": "user", "content": user_msg}
     ]

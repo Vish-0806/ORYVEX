@@ -31,10 +31,24 @@ Expected JSON Schema:
 
 def build_capa_prompt(structured_incident: dict, root_causes: list, evidence: list) -> list:
     import json
+    compact_incident = {
+        "product": structured_incident.get("product_name"),
+        "batch": structured_incident.get("batch_number"),
+        "defect": structured_incident.get("observed_result"),
+        "containment": structured_incident.get("immediate_containment")
+    }
+    compact_causes = [
+        f"{c.get('id', 'RCH')}: {c.get('description')} [Category: {c.get('category')}]"
+        for c in root_causes[:4]
+    ]
+
+    user_msg = (
+        f"INCIDENT: {json.dumps(compact_incident)}\n"
+        f"IDENTIFIED ROOT CAUSES:\n" + "\n".join(compact_causes) +
+        "\n\nGenerate 3-5 justified, high-impact Corrective & Preventive Actions (CAPA) in JSON format."
+    )
+
     return [
         {"role": "system", "content": CAPA_SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": f"INCIDENT CONTEXT:\n{json.dumps(structured_incident, indent=2)}\n\nROOT CAUSE HYPOTHESES:\n{json.dumps(root_causes, indent=2)}\n\nEVIDENCE:\n{json.dumps(evidence, indent=2)}\n\nGenerate justified Corrective and Preventive Action recommendations now."
-        }
+        {"role": "user", "content": user_msg}
     ]

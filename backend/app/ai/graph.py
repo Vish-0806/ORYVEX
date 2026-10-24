@@ -83,14 +83,12 @@ def build_extraction_graph():
 def build_investigation_graph():
     builder = StateGraph(RCAWorkflowState)
 
-    builder.add_node("evidence_gap", evidence_gap_node)
     builder.add_node("root_cause", root_cause_node)
     builder.add_node("capa", capa_generation_node)
     builder.add_node("validation", validation_node)
 
-    builder.set_entry_point("evidence_gap")
+    builder.set_entry_point("root_cause")
 
-    builder.add_edge("evidence_gap", "root_cause")
     builder.add_edge("root_cause", "capa")
     builder.add_edge("capa", "validation")
     builder.add_edge("validation", END)

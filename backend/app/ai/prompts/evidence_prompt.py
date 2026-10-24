@@ -54,10 +54,18 @@ Expected JSON Schema:
 
 def build_evidence_prompt(structured_incident: dict, existing_evidence: list) -> list:
     import json
+    compact_incident = {
+        "product": structured_incident.get("product_name"),
+        "batch": structured_incident.get("batch_number"),
+        "equipment": structured_incident.get("equipment_id"),
+        "defect": structured_incident.get("observed_result"),
+        "description": structured_incident.get("detailed_description") or structured_incident.get("incident_summary")
+    }
+    user_msg = (
+        f"INCIDENT: {json.dumps(compact_incident)}\n"
+        f"Analyze missing records, audit gaps, and recommend 3-5 critical missing evidence items in JSON format."
+    )
     return [
         {"role": "system", "content": EVIDENCE_GAP_SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": f"INCIDENT DATA:\n{json.dumps(structured_incident, indent=2)}\n\nEXISTING EVIDENCE ITEMS:\n{json.dumps(existing_evidence, indent=2)}\n\nAnalyze evidence gaps and recommend targeted evidence requests now."
-        }
+        {"role": "user", "content": user_msg}
     ]
