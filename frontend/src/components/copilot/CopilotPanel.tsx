@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { 
-  Bot, Send, Upload, FileText, CheckCircle, 
-  AlertCircle, Sparkles, RefreshCw, ArrowRight, Zap, ShieldCheck 
+  Bot, Send, Upload, FileText, CheckCircle2, 
+  AlertCircle, Sparkles, RefreshCw, ShieldCheck, 
+  MessageSquare, Search, AlertTriangle, ChevronRight, Check
 } from "lucide-react";
 import { RootState } from "../../app/store";
 import { 
@@ -73,13 +74,14 @@ export const CopilotPanel: React.FC = () => {
   );
   const { currentInvestigation, extractionMeta } = useSelector((state: RootState) => state.rca);
 
+  const [activePanelTab, setActivePanelTab] = useState<"chat" | "intake" | "gaps">("chat");
   const [chatInput, setChatInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isProcessing, isChatLoading]);
+  }, [messages, isProcessing, isChatLoading, activePanelTab]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -131,6 +133,9 @@ export const CopilotPanel: React.FC = () => {
           ],
         })
       );
+
+      // Automatically switch user to Chat tab to see conversation and next actions
+      setActivePanelTab("chat");
     } catch (err: any) {
       dispatch(setError(err.message || "Extraction failed."));
       dispatch(setProcessing({ isProcessing: false }));
@@ -191,247 +196,429 @@ export const CopilotPanel: React.FC = () => {
     }
   };
 
+  const missingGapsCount = extractionMeta?.missingNotices?.length || 0;
+
   return (
     <div className="copilot-panel">
-      {/* Copilot Header */}
+      {/* 1. Master Header */}
       <div className="copilot-header">
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--turq-500)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 0 12px rgba(6, 182, 212, 0.4)" }}>
-            <Bot size={18} />
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--turq-500)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", boxShadow: "0 0 12px rgba(6, 182, 212, 0.4)" }}>
+            <Bot size={17} />
           </div>
           <div>
-            <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "var(--ocean-950)", display: "flex", alignItems: "center", gap: "0.35rem" }}>
               ORYVEX AI Copilot
-              <span style={{ fontSize: "0.65rem", padding: "0.1rem 0.4rem", borderRadius: "9999px", background: "rgba(6, 182, 212, 0.12)", color: "var(--turq-700)", fontWeight: 700, border: "1px solid var(--turq-300)" }}>
+              <span style={{ fontSize: "0.62rem", padding: "0.08rem 0.35rem", borderRadius: "9999px", background: "rgba(6, 182, 212, 0.12)", color: "var(--turq-700)", fontWeight: 700, border: "1px solid var(--turq-300)" }}>
                 ONLINE
               </span>
             </div>
-            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+            <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>
               LangGraph + Groq Investigation Intelligence
             </div>
           </div>
         </div>
       </div>
 
-      {/* Document & Incident Intake Section */}
-      <div className="copilot-intake-card">
-        <div className="intake-tabs">
-          <button
-            className={`tab-btn ${inputTab === "text" ? "active" : ""}`}
-            onClick={() => dispatch(setInputTab("text"))}
-          >
-            <FileText size={13} style={{ display: "inline", marginRight: "4px" }} />
-            Paste Incident Text
-          </button>
-          <button
-            className={`tab-btn ${inputTab === "pdf" ? "active" : ""}`}
-            onClick={() => dispatch(setInputTab("pdf"))}
-          >
-            <Upload size={13} style={{ display: "inline", marginRight: "4px" }} />
-            Upload PDF Document
-          </button>
-        </div>
+      {/* 2. Top Navigation Tabs */}
+      <div className="copilot-nav-tabs">
+        <button
+          type="button"
+          className={`copilot-nav-tab ${activePanelTab === "chat" ? "active" : ""}`}
+          onClick={() => setActivePanelTab("chat")}
+        >
+          <MessageSquare size={13} />
+          AI Copilot Chat
+        </button>
+        <button
+          type="button"
+          className={`copilot-nav-tab ${activePanelTab === "intake" ? "active" : ""}`}
+          onClick={() => setActivePanelTab("intake")}
+        >
+          <Upload size={13} />
+          Document Intake
+        </button>
+        <button
+          type="button"
+          className={`copilot-nav-tab ${activePanelTab === "gaps" ? "active" : ""}`}
+          onClick={() => setActivePanelTab("gaps")}
+        >
+          <Search size={13} />
+          Audit Gaps
+          {missingGapsCount > 0 && (
+            <span className="copilot-tab-badge">{missingGapsCount}</span>
+          )}
+        </button>
+      </div>
 
-        {inputTab === "text" ? (
-          <div>
-            <textarea
-              className="form-textarea"
-              style={{ minHeight: "90px", fontSize: "0.8rem", marginBottom: "0.6rem", borderColor: "var(--turq-300)" }}
-              placeholder="Paste OOS lab notice, manufacturing deviation report, or quality email narrative..."
-              value={pastedText}
-              onChange={(e) => dispatch(setPastedText(e.target.value))}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+      {/* 3. TAB CONTENT BODIES */}
+
+      {/* --- TAB A: AI COPILOT CHAT --- */}
+      {activePanelTab === "chat" && (
+        <div style={{ flex: "1 1 0%", minHeight: 0, display: "flex", flexDirection: "column" }}>
+          {/* Active Context Bar */}
+          <div className="copilot-context-banner">
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <FileText size={13} color="var(--turq-600)" />
+              <span style={{ fontWeight: 600 }}>
+                {currentInvestigation.batch_number 
+                  ? `Batch ${currentInvestigation.batch_number} • ${currentInvestigation.product_name || "API Intermediate"}`
+                  : selectedFileName || "New Investigation Session"}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexShrink: 0 }}>
+              {missingGapsCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setActivePanelTab("gaps")}
+                  style={{
+                    background: "#fef3c7",
+                    color: "#b45309",
+                    border: "1px solid #fde68a",
+                    borderRadius: "4px",
+                    fontSize: "0.68rem",
+                    fontWeight: 700,
+                    padding: "0.15rem 0.45rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  {missingGapsCount} Missing Records
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setActivePanelTab("intake")}
+                style={{
+                  background: "transparent",
+                  color: "var(--turq-700)",
+                  border: "none",
+                  fontSize: "0.68rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                Upload/Intake
+              </button>
+            </div>
+          </div>
+
+          {/* Scrollable Message Stream */}
+          <div className="copilot-chat-container">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-assistant"}`}
+              >
+                <div style={{ whiteSpace: "pre-wrap" }}>{msg.content}</div>
+
+                {/* Structured Form Patch Visual Indicator */}
+                {msg.patch && Object.keys(msg.patch).length > 0 && (
+                  <div className="chat-bubble-patch">
+                    <div style={{ fontWeight: 700, color: "var(--turq-800)", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                      <ShieldCheck size={13} color="var(--turq-600)" /> Updated Structured RCA Form Fields:
+                    </div>
+                    {Object.entries(msg.patch).map(([field, val]) => (
+                      <div key={field} style={{ fontSize: "0.72rem", color: "var(--ocean-950)" }}>
+                        <strong>{field}:</strong> {String(val)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Suggested action pills */}
+                {msg.suggested_actions && msg.suggested_actions.length > 0 && (
+                  <div style={{ marginTop: "0.55rem", display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+                    {msg.suggested_actions.map((act, i) => (
+                      <button
+                        key={i}
+                        className="suggestion-pill"
+                        onClick={() => handleSendMessage(act)}
+                      >
+                        {act}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {isChatLoading && (
+              <div className="chat-bubble chat-bubble-assistant" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <RefreshCw size={14} className="spin" color="var(--turq-600)" />
+                <span style={{ fontSize: "0.78rem", color: "var(--turq-800)", fontWeight: 500 }}>
+                  Analyzing investigation context via Groq...
+                </span>
+              </div>
+            )}
+
+            <div ref={chatBottomRef} />
+          </div>
+
+          {/* Bottom Chat Input Form & Quick Prompt Suggestions */}
+          <div className="copilot-input-area">
+            <div className="prompt-suggestions">
+              <button className="suggestion-pill" onClick={() => handleSendMessage("Which evidence is currently missing?")}>
+                Which evidence is missing?
+              </button>
+              <button className="suggestion-pill" onClick={() => handleSendMessage("Change the batch number to ART-2026-042")}>
+                Set batch to ART-2026-042
+              </button>
+              <button className="suggestion-pill" onClick={() => handleSendMessage("Explain the reasoning behind potential root cause number 1")}>
+                Explain root cause 1
+              </button>
+              <button className="suggestion-pill" onClick={() => handleSendMessage("Suggest preventive actions for the suspected chiller issue")}>
+                Suggest preventive actions
+              </button>
+            </div>
+
+            <form
+              className="chat-input-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+            >
+              <input
+                type="text"
+                className="form-input"
+                style={{ fontSize: "0.82rem", padding: "0.5rem 0.8rem" }}
+                placeholder="Ask a question or command a field update (e.g. 'Set severity to Critical')..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                disabled={isChatLoading}
+              />
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ padding: "0 0.85rem", flexShrink: 0 }}
+                disabled={isChatLoading || !chatInput.trim()}
+              >
+                <Send size={15} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB B: DOCUMENT INTAKE --- */}
+      {activePanelTab === "intake" && (
+        <div className="copilot-tab-body">
+          <div className="copilot-intake-card">
+            <div style={{ marginBottom: "0.85rem", fontSize: "0.82rem", color: "var(--ocean-950)", fontWeight: 700 }}>
+              Smart Ingestion & Extraction Engine
+            </div>
+
+            <div className="intake-tabs">
+              <button
+                className={`tab-btn ${inputTab === "pdf" ? "active" : ""}`}
+                onClick={() => dispatch(setInputTab("pdf"))}
+              >
+                <Upload size={13} style={{ display: "inline", marginRight: "4px" }} />
+                Upload PDF Document
+              </button>
+              <button
+                className={`tab-btn ${inputTab === "text" ? "active" : ""}`}
+                onClick={() => dispatch(setInputTab("text"))}
+              >
+                <FileText size={13} style={{ display: "inline", marginRight: "4px" }} />
+                Paste Incident Text
+              </button>
+            </div>
+
+            {inputTab === "pdf" ? (
+              <div>
+                <div
+                  style={{
+                    border: "2px dashed var(--turq-400)",
+                    borderRadius: "10px",
+                    padding: "1.5rem",
+                    textAlign: "center",
+                    background: "var(--turq-50)",
+                    marginBottom: "0.85rem",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                  onClick={() => document.getElementById("pdf-file-input")?.click()}
+                >
+                  <Upload size={28} color="var(--turq-600)" style={{ margin: "0 auto 0.5rem auto" }} />
+                  <div style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--ocean-950)" }}>
+                    {selectedFileName ? selectedFileName : "Click to select or drag PDF file"}
+                  </div>
+                  <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
+                    Accepts digitally rendered PDF reports (e.g. incident_report_ART-2026-042.pdf)
+                  </div>
+                  <input
+                    id="pdf-file-input"
+                    type="file"
+                    accept=".pdf"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                    LangGraph 3-pass extraction
+                  </span>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleExtract}
+                    disabled={isProcessing || !selectedFile}
+                  >
+                    <Sparkles size={14} />
+                    {isProcessing ? "Extracting..." : "Process PDF & Populate"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <textarea
+                  className="form-textarea"
+                  style={{ minHeight: "140px", fontSize: "0.8rem", marginBottom: "0.6rem", borderColor: "var(--turq-300)" }}
+                  placeholder="Paste OOS lab notice, manufacturing deviation report, or quality email narrative..."
+                  value={pastedText}
+                  onChange={(e) => dispatch(setPastedText(e.target.value))}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => dispatch(setPastedText(FICTIONAL_DEMO_TEXT))}
+                    title="Populate input with clearly identified fictional API batch scenario"
+                    style={{ fontSize: "0.72rem" }}
+                  >
+                    Load Fictional Impurity Incident
+                  </button>
+
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleExtract}
+                    disabled={isProcessing || !pastedText.trim()}
+                  >
+                    <Sparkles size={14} />
+                    {isProcessing ? "Extracting..." : "Extract & Populate Form"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {isProcessing && (
+              <div style={{ marginTop: "0.85rem", padding: "0.75rem 1rem", background: "rgba(6, 182, 212, 0.08)", border: "1px solid var(--turq-300)", borderRadius: "8px", fontSize: "0.78rem", color: "var(--turq-800)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <RefreshCw size={14} className="spin" />
+                <span>{processingStep || "Executing LangGraph AI workflow..."}</span>
+              </div>
+            )}
+
+            {error && (
+              <div style={{ marginTop: "0.85rem", padding: "0.75rem 1rem", background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "8px", fontSize: "0.78rem", color: "#e11d48", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <AlertCircle size={14} />
+                <span>{error}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick guide card */}
+          <div style={{ padding: "1.25rem 1.4rem", margin: "1rem 1.4rem", background: "#f8fafc", borderRadius: "10px", border: "1.5px solid var(--border-subtle)" }}>
+            <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--ocean-950)", marginBottom: "0.4rem", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <ShieldCheck size={15} color="var(--turq-600)" />
+              GMP Zero-Hallucination Protocol
+            </div>
+            <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+              Under EU & FDA cGMP Annex 11, ORYVEX strictly grounds all extracted facts in explicit source document text. Any missing parameter (such as lot numbers, dates, or specifications) is preserved as unknown rather than assumed.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TAB C: AUDIT & EVIDENCE GAPS --- */}
+      {activePanelTab === "gaps" && (
+        <div className="copilot-tab-body" style={{ padding: "1.25rem 1.4rem" }}>
+          {extractionMeta ? (
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--turq-800)", fontWeight: 700, fontSize: "0.85rem", marginBottom: "0.5rem" }}>
+                <CheckCircle2 size={16} color="var(--turq-600)" />
+                Extraction Summary & Data Provenance
+              </div>
+              <div style={{ fontSize: "0.78rem", color: "var(--ocean-950)", background: "#f0fdfa", padding: "0.75rem 1rem", borderRadius: "8px", border: "1px solid var(--turq-300)", marginBottom: "1rem" }}>
+                {extractionMeta.summary}
+              </div>
+
+              {/* Missing Records Audit List */}
+              <div style={{ marginTop: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.8rem", fontWeight: 700, color: "#b45309", marginBottom: "0.5rem" }}>
+                  <AlertTriangle size={15} color="#d97706" />
+                  Identified Missing Records & Audit Gaps ({missingGapsCount})
+                </div>
+
+                {extractionMeta.missingNotices.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    {extractionMeta.missingNotices.map((notice, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: "#fffbeb",
+                          border: "1px solid #fde68a",
+                          borderRadius: "8px",
+                          padding: "0.6rem 0.85rem",
+                          fontSize: "0.74rem",
+                          color: "#92400e",
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "0.4rem",
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        <span style={{ fontWeight: 800, color: "#d97706" }}>#{i + 1}</span>
+                        <span>{notice}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: "0.75rem", color: "var(--turq-700)", padding: "0.6rem", background: "#ecfeff", borderRadius: "6px" }}>
+                    No critical evidence gaps detected. All mandatory records were referenced in source document.
+                  </div>
+                )}
+              </div>
+
+              {/* Action trigger */}
+              <div style={{ marginTop: "1.25rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center", fontSize: "0.8rem" }}
+                  onClick={() => {
+                    setActivePanelTab("chat");
+                    handleSendMessage("Which evidence is currently missing and how do we verify each gap?");
+                  }}
+                >
+                  <MessageSquare size={14} />
+                  Ask Copilot to Resolve Evidence Gaps
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
+              <Search size={32} color="var(--turq-400)" style={{ margin: "0 auto 0.75rem auto" }} />
+              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--ocean-950)", marginBottom: "0.35rem" }}>
+                No Document Extracted Yet
+              </div>
+              <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginBottom: "1rem" }}>
+                Upload an Out-of-Specification (OOS) report or deviation narrative in the Intake tab to run the automated AI Evidence Audit.
+              </div>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
-                onClick={() => dispatch(setPastedText(FICTIONAL_DEMO_TEXT))}
-                title="Populate input with clearly identified fictional API batch scenario"
-                style={{ fontSize: "0.72rem" }}
+                onClick={() => setActivePanelTab("intake")}
               >
-                Load Fictional Impurity Incident
+                Go to Document Intake
               </button>
-
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleExtract}
-                disabled={isProcessing || !pastedText.trim()}
-              >
-                <Sparkles size={14} />
-                {isProcessing ? "Extracting..." : "Extract & Populate Form"}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div
-              style={{
-                border: "2px dashed var(--turq-400)",
-                borderRadius: "10px",
-                padding: "1.2rem",
-                textAlign: "center",
-                background: "var(--turq-50)",
-                marginBottom: "0.6rem",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-              onClick={() => document.getElementById("pdf-file-input")?.click()}
-            >
-              <Upload size={24} color="var(--turq-600)" style={{ margin: "0 auto 0.4rem auto" }} />
-              <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ocean-950)" }}>
-                {selectedFileName ? selectedFileName : "Click to select or drag PDF file"}
-              </div>
-              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                Accepts digitally rendered PDF reports (Max 10MB)
-              </div>
-              <input
-                id="pdf-file-input"
-                type="file"
-                accept=".pdf"
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleExtract}
-                disabled={isProcessing || !selectedFile}
-              >
-                <Sparkles size={14} />
-                {isProcessing ? "Extracting..." : "Process PDF & Populate"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {isProcessing && (
-          <div style={{ marginTop: "0.6rem", padding: "0.6rem 0.85rem", background: "rgba(6, 182, 212, 0.08)", border: "1px solid var(--turq-300)", borderRadius: "8px", fontSize: "0.78rem", color: "var(--turq-800)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <RefreshCw size={14} className="spin" />
-            <span>{processingStep || "Executing LangGraph AI workflow..."}</span>
-          </div>
-        )}
-
-        {error && (
-          <div style={{ marginTop: "0.6rem", padding: "0.6rem 0.85rem", background: "#fff1f2", border: "1px solid #fecdd3", borderRadius: "8px", fontSize: "0.78rem", color: "#e11d48", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <AlertCircle size={14} />
-            <span>{error}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Extraction Summary Card */}
-      {extractionMeta && (
-        <div style={{ padding: "0.85rem 1.25rem", background: "linear-gradient(to right, #ecfeff, #ffffff)", borderBottom: "1px solid var(--turq-200)", fontSize: "0.78rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: "var(--turq-800)", fontWeight: 700, marginBottom: "0.25rem" }}>
-            <CheckCircle size={15} color="var(--turq-600)" />
-            AI Extraction Summary
-          </div>
-          <div style={{ color: "var(--ocean-950)", fontWeight: 500 }}>{extractionMeta.summary}</div>
-          {extractionMeta.missingNotices.length > 0 && (
-            <div style={{ marginTop: "0.35rem", color: "#b45309", background: "#fef3c7", padding: "0.25rem 0.5rem", borderRadius: "4px", border: "1px solid #fde68a", fontSize: "0.72rem" }}>
-              <strong>Missing Records:</strong> {extractionMeta.missingNotices.join(", ")}
             </div>
           )}
         </div>
       )}
-
-      {/* Copilot Chat Message Stream */}
-      <div className="copilot-chat-container">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-assistant"}`}
-          >
-            <div style={{ whiteSpace: "pre-wrap" }}>{msg.content}</div>
-
-            {/* Structured Form Patch Visual Indicator */}
-            {msg.patch && Object.keys(msg.patch).length > 0 && (
-              <div className="chat-bubble-patch">
-                <div style={{ fontWeight: 700, color: "var(--turq-800)", marginBottom: "0.25rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                  <ShieldCheck size={13} color="var(--turq-600)" /> Updated Structured RCA Form Fields:
-                </div>
-                {Object.entries(msg.patch).map(([field, val]) => (
-                  <div key={field} style={{ fontSize: "0.72rem", color: "var(--ocean-950)" }}>
-                    <strong>{field}:</strong> {String(val)}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Suggested action pills */}
-            {msg.suggested_actions && msg.suggested_actions.length > 0 && (
-              <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
-                {msg.suggested_actions.map((act, i) => (
-                  <button
-                    key={i}
-                    className="suggestion-pill"
-                    onClick={() => handleSendMessage(act)}
-                  >
-                    {act}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {isChatLoading && (
-          <div className="chat-bubble chat-bubble-assistant" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <RefreshCw size={14} className="spin" color="var(--turq-600)" />
-            <span style={{ fontSize: "0.8rem", color: "var(--turq-800)", fontWeight: 500 }}>
-              Analyzing investigation context via Groq...
-            </span>
-          </div>
-        )}
-
-        <div ref={chatBottomRef} />
-      </div>
-
-      {/* Chat Input Area */}
-      <div className="copilot-input-area">
-        <div className="prompt-suggestions">
-          <button className="suggestion-pill" onClick={() => handleSendMessage("Which evidence is currently missing?")}>
-            Which evidence is missing?
-          </button>
-          <button className="suggestion-pill" onClick={() => handleSendMessage("Change the batch number to ART-2026-042")}>
-            Set batch to ART-2026-042
-          </button>
-          <button className="suggestion-pill" onClick={() => handleSendMessage("Explain the reasoning behind potential root cause number 1")}>
-            Explain root cause 1
-          </button>
-          <button className="suggestion-pill" onClick={() => handleSendMessage("Suggest preventive actions for the suspected chiller issue")}>
-            Suggest preventive actions
-          </button>
-        </div>
-
-        <form
-          className="chat-input-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-        >
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Ask a question or command a field update (e.g. 'Set severity to Critical')..."
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            disabled={isChatLoading}
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ padding: "0 0.9rem" }}
-            disabled={isChatLoading || !chatInput.trim()}
-          >
-            <Send size={15} />
-          </button>
-        </form>
-      </div>
     </div>
   );
 };
 
+export default CopilotPanel;
