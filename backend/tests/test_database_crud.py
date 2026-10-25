@@ -101,3 +101,67 @@ def test_investigation_lifecycle_crud():
         db.commit()
     finally:
         db.close()
+
+
+def test_multiple_investigations_with_same_child_ids():
+    payload_1 = {
+        "title": "Investigation Alpha",
+        "product_name": "Product A",
+        "evidence_items": [
+            {"id": "EVD-01", "description": "Log A", "evidence_type": "Analytical Log"},
+            {"id": "EVD-02", "description": "Log B", "evidence_type": "Batch Record"}
+        ],
+        "five_whys_steps": [
+            {"id": "WHY-01", "step_order": 1, "why_question": "Why?", "proposed_answer": "Answer 1"}
+        ],
+        "root_cause_hypotheses": [
+            {"id": "RCH-01", "description": "Cause 1", "category": "Method"}
+        ],
+        "capa_actions": [
+            {"id": "CAPA-01", "action_type": "Corrective", "description": "Fix 1"}
+        ]
+    }
+
+    payload_2 = {
+        "title": "Investigation Beta",
+        "product_name": "Product B",
+        "evidence_items": [
+            {"id": "EVD-01", "description": "Log X", "evidence_type": "Analytical Log"},
+            {"id": "EVD-02", "description": "Log Y", "evidence_type": "Batch Record"}
+        ],
+        "five_whys_steps": [
+            {"id": "WHY-01", "step_order": 1, "why_question": "Why again?", "proposed_answer": "Answer 2"}
+        ],
+        "root_cause_hypotheses": [
+            {"id": "RCH-01", "description": "Cause 2", "category": "Machine"}
+        ],
+        "capa_actions": [
+            {"id": "CAPA-01", "action_type": "Preventive", "description": "Fix 2"}
+        ]
+    }
+
+    res1 = client.post("/api/v1/investigations", json=payload_1)
+    assert res1.status_code == 201
+    id1 = res1.json()["id"]
+
+    res2 = client.post("/api/v1/investigations", json=payload_2)
+    assert res2.status_code == 201
+    id2 = res2.json()["id"]
+
+    # Verify both exist and have their independent child rows with same IDs
+    fetch1 = client.get(f"/api/v1/investigations/{id1}").json()
+    fetch2 = client.get(f"/api/v1/investigations/{id2}").json()
+
+    assert fetch1["evidence_items"][0]["id"] == "EVD-01"
+    assert fetch2["evidence_items"][0]["id"] == "EVD-01"
+    assert fetch1["evidence_items"][0]["description"] == "Log A"
+    assert fetch2["evidence_items"][0]["description"] == "Log X"
+
+    # Cleanup
+    db = SessionLocal()
+    try:
+        db.query(Investigation).filter(Investigation.id.in_([id1, id2])).delete(synchronize_session=False)
+        db.commit()
+    finally:
+        db.close()
+

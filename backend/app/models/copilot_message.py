@@ -7,7 +7,7 @@ class CopilotMessage(Base):
     __tablename__ = "copilot_messages"
 
     id = Column(String(64), primary_key=True)
-    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), nullable=False, index=True)
+    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), primary_key=True, nullable=False, index=True)
     role = Column(String(32), nullable=False) # user, assistant, system
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)

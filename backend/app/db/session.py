@@ -31,7 +31,29 @@ def init_db():
         from backend.app.models.capa import CapaAction
         from backend.app.models.copilot_message import CopilotMessage
         Base.metadata.create_all(bind=engine)
-        logger.info("Database tables verified and initialized successfully.")
+
+        # Ensure composite primary keys (investigation_id, id) for child tables
+        from sqlalchemy import text
+        child_tables = [
+            'evidence_items',
+            'five_whys_steps',
+            'root_cause_hypotheses',
+            'capa_actions',
+            'copilot_messages'
+        ]
+        with engine.begin() as conn:
+            for tbl in child_tables:
+                col_count = conn.execute(text(f"""
+                    SELECT array_length(conkey, 1)
+                    FROM pg_constraint
+                    WHERE conname = '{tbl}_pkey'
+                      AND conrelid = '{tbl}'::regclass
+                """)).scalar()
+                if col_count == 1:
+                    conn.execute(text(f"ALTER TABLE {tbl} DROP CONSTRAINT {tbl}_pkey;"))
+                    conn.execute(text(f"ALTER TABLE {tbl} ADD CONSTRAINT {tbl}_pkey PRIMARY KEY (investigation_id, id);"))
+
+        logger.info("Database tables and composite primary keys verified successfully.")
         return True
     except Exception as e:
         logger.error(f"Failed to initialize database tables: {e}")

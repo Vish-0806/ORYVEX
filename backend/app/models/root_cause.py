@@ -6,7 +6,7 @@ class RootCauseHypothesis(Base):
     __tablename__ = "root_cause_hypotheses"
 
     id = Column(String(64), primary_key=True) # e.g. RCH-01
-    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), nullable=False, index=True)
+    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), primary_key=True, nullable=False, index=True)
     description = Column(Text, nullable=False)
     category = Column(String(64), nullable=False) # Man, Machine, Method, Material, Measurement, Environment
     reasoning = Column(Text, nullable=True)

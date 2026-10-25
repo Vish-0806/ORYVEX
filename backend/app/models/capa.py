@@ -6,7 +6,7 @@ class CapaAction(Base):
     __tablename__ = "capa_actions"
 
     id = Column(String(64), primary_key=True) # e.g. CAPA-01
-    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), nullable=False, index=True)
+    investigation_id = Column(String(64), ForeignKey("investigations.id", ondelete="CASCADE"), primary_key=True, nullable=False, index=True)
     action_type = Column(String(64), nullable=False) # Corrective, Preventive
     description = Column(Text, nullable=False)
     rationale = Column(Text, nullable=True)
